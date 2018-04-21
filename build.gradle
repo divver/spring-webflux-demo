@@ -3,7 +3,6 @@ version '0.0.1'
 
 buildscript {
     repositories {
-//        maven { url 'https://maven.bkjk-inc.com/repository/maven-public/' }
         maven { url 'https://repo.spring.io/libs-milestone' }
     }
     dependencies {
@@ -13,8 +12,6 @@ buildscript {
 }
 
 repositories {
-//    maven { url 'http://maven.bkjk-inc.com/nexus/content/groups/public/' }
-//    maven { url 'https://maven.bkjk-inc.com/repository/maven-releases/' }
     maven { url 'https://repo.spring.io/libs-milestone' }
 }
 
@@ -32,8 +29,6 @@ subprojects {
     }
 
     repositories {
-//        maven { url 'http://maven.bkjk-inc.com/nexus/content/groups/public/' }
-//        maven { url 'https://maven.bkjk-inc.com/repository/maven-releases/' }
         maven { url 'https://repo.spring.io/libs-milestone' }
     }
 
