@@ -1,0 +1,88 @@
+group 'com.demo'
+version '0.0.1'
+
+buildscript {
+    repositories {
+//        maven { url 'https://maven.bkjk-inc.com/repository/maven-public/' }
+        maven { url 'https://repo.spring.io/libs-milestone' }
+    }
+    dependencies {
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.0.0.RELEASE'
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE"
+    }
+}
+
+repositories {
+//    maven { url 'http://maven.bkjk-inc.com/nexus/content/groups/public/' }
+//    maven { url 'https://maven.bkjk-inc.com/repository/maven-releases/' }
+    maven { url 'https://repo.spring.io/libs-milestone' }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    dependencyManagement {
+        imports {
+            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Finchley.M8'
+        }
+    }
+
+    repositories {
+//        maven { url 'http://maven.bkjk-inc.com/nexus/content/groups/public/' }
+//        maven { url 'https://maven.bkjk-inc.com/repository/maven-releases/' }
+        maven { url 'https://repo.spring.io/libs-milestone' }
+    }
+
+//defaultTasks 'barJar'
+
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+
+    bootJar.enabled = false
+
+    jar {
+        manifest {
+            attributes(
+                    "Implementation-Title": project.name,
+                    "Implementation-Version": project.version
+            )
+        }
+    }
+
+    task customJar(type: Jar) {
+        manifest {
+            attributes(
+                    "Implementation-Title": project.name,
+                    "Implementation-Version": project.version
+            )
+        }
+
+        from files(sourceSets.main.output.classesDir)
+        with jar
+    }
+
+    bootRun {
+        systemProperties System.properties
+        jvmArgs "-Xmx1024m" //, "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
+    }
+
+    springBoot {
+        buildInfo()
+    }
+
+    idea {
+        module {
+            inheritOutputDirs = false
+            outputDir = file("$buildDir/classes/main/")
+        }
+    }
+
+    wrapper {
+        description 'creates gradle wrapper in order to execute ./gradlew <task>'
+        gradleVersion = '4.6'
+    }
+}

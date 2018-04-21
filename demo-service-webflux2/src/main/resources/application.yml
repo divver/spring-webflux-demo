@@ -1,0 +1,19 @@
+
+server.port: 8082
+
+logging.level.org.springframework.web: DEBUG
+
+spring:
+#  datasource:
+#    driver-class-name: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://123.206.213.215:3306/petstore_dev?characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+#    username: test
+#    password: 1234
+#    tomcat.maxActive: 60
+#    tomcat.initSQL: "select 1 from dual"
+
+spring:
+  data:
+    mongodb:
+      host: 127.0.0.1
+      port: 27017

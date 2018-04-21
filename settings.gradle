@@ -1,0 +1,5 @@
+include 'demo-domain'
+include 'demo-service-servlet'
+include 'demo-service-webflux'
+include 'demo-service-webflux2'
+
