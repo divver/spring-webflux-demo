@@ -21,7 +21,8 @@ public class Demo {
 //        testWebClientGet();
 //        testFlux();
 //        testFlux2();
-        testMonoSink();
+        testFlux3();
+//        testMonoSink();
     }
 
     static void testWebClientGet() throws Exception{
@@ -122,6 +123,19 @@ public class Demo {
 //               .publishOn(Schedulers.newParallel("show"))
 //               .parallel().runOn(Schedulers.newParallel("show"))
                .subscribe(value -> logger.info("value is {}", value));
+    }
+
+    static void testFlux3(){
+        Flux.just(1, 2, 3, 4, 5)
+                .log()
+                .map(i -> i * i)
+                .log()
+                .filter(i -> (i % 2) == 0)
+                .log()
+                .subscribeOn(Schedulers.newElastic("opt"))
+                .publishOn(Schedulers.newParallel("show"))
+//               .parallel().runOn(Schedulers.newParallel("show"))
+                .subscribe(value -> logger.info("value is {}", value));
     }
 
     static void testMonoSink(){
