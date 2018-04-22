@@ -19,7 +19,7 @@ public class OrderController {
 	private OrderRepository orderRepository;
 
 	@ApiOperation(value = "query orders", response = Order.class)
-	@GetMapping("/orders")
+	@GetMapping(value = "/orders", produces = "application/stream+json")
 	public List<Order> query() {
 		return this.orderRepository.findAll();
 	}

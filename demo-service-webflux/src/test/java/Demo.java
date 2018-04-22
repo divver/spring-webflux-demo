@@ -1,24 +1,44 @@
 import com.demo.domain.Order;
 import org.reactivestreams.Subscription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.List;
 
 public class Demo {
+    private static final Logger logger = LoggerFactory.getLogger(Demo.class);
+
     public static void main(String[] args) throws Exception {
 //        testWebClientPost();
 //        testWebClientGet();
-        testFlux();
+//        testFlux();
+//        testFlux2();
+        testMonoSink();
     }
 
-    static void testWebClientGet(){
+    static void testWebClientGet() throws Exception{
         WebClient orderClient = WebClient.create("http://127.0.0.1:8081");
+
+        orderClient.get()
+                .uri("/orders")
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToFlux(Order.class)
+                .log()
+                .subscribe(order -> System.out.println(order));
+
+
+        Thread.sleep(1000);
+
+        System.out.println("====================================================");
 
         List<Order> orderList = orderClient.get()
                 .uri("/orders")
@@ -90,5 +110,23 @@ public class Demo {
                 });
 
         Thread.sleep(1000 * 15);
+    }
+
+    static void testFlux2(){
+       Flux.just(1, 2, 3, 4, 5)
+               .log()
+               .map(i -> i * i)
+               .log()
+               .filter(i -> (i % 2) == 0)
+               .log()
+//               .publishOn(Schedulers.newParallel("show"))
+//               .parallel().runOn(Schedulers.newParallel("show"))
+               .subscribe(value -> logger.info("value is {}", value));
+    }
+
+    static void testMonoSink(){
+        Mono.create(sink -> {
+            sink.success(1);
+        }).subscribe(System.out::println);
     }
 }

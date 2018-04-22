@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_STREAM_JSON;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 
@@ -20,7 +21,7 @@ public class OrderHandler {
 	private OrderRepository orderRepository;
 
 	public Mono<ServerResponse> orders(ServerRequest request) {
-		return ok().contentType(APPLICATION_JSON).body(
+		return ok().contentType(APPLICATION_STREAM_JSON).body(
 					this.orderRepository.findAll().log(), Order.class
 		);
 	}

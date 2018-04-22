@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.Duration;
 import java.util.List;
 
 @Api
@@ -26,9 +27,9 @@ public class OrderController {
 	private OrderRepository orderRepository;
 
 	@ApiOperation(value = "query orders", response = Order.class)
-	@GetMapping(value = "/orders")//, produces = "application/stream+json"
+	@GetMapping(value = "/orders")//, produces = "application/stream+json"  !!! note result format in browser
 	public Flux<Order> query() {
-		return this.orderRepository.findAll().log();
+		return this.orderRepository.findAll().delayElements(Duration.ofMillis(200)).log();
 	}
 
 	@ApiOperation(value = "get order by id", response = Order.class)
