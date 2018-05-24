@@ -1,13 +1,16 @@
 package com.demo.web;
 
+import com.demo.domain.ExtractTask;
 import com.demo.domain.Order;
 import com.demo.domain.Item;
+import com.demo.repo.ExtractTaskRepository;
 import com.demo.repo.OrderH2Reposity;
 import com.demo.repo.OrderRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -103,6 +106,38 @@ public class OrderController {
 
 		return Mono.fromCallable(() -> this.orderH2Reposity.saveAll(orders.collectList().block()))
 				.subscribeOn(db_workers)
+				.log()
+				.then();
+	}
+
+
+	//-----------------redis----------------//
+	@Autowired
+	ExtractTaskRepository extractTaskRepository;//dont't support ReactiveCrudRepository
+
+	@Autowired
+	ReactiveRedisTemplate reactiveRedisTemplate;
+
+
+
+	@ApiOperation(value = "test redis", response = String.class)
+	@GetMapping(value = "/test")//, produces = "application/stream+json"
+	public Flux<String> test() {
+		reactiveRedisTemplate.opsForValue().set("test", "test").subscribe();
+		return reactiveRedisTemplate.opsForValue().get("test").flux().log();
+	}
+
+	@ApiOperation(value = "query extract tasks", response = ExtractTask.class)
+	@GetMapping(value = "/tasks")//, produces = "application/stream+json"
+	public Flux<ExtractTask> tasks() {
+		return extractTaskRepository.findAll().log();
+	}
+
+	@ApiOperation(value = "submit tasks", response = ExtractTask.class)
+	@PostMapping(path="/tasks", consumes = "application/stream+json")
+	@ResponseStatus(HttpStatus.CREATED)
+	public Mono<Void> submitTask(@ApiParam(value = "tasks") @RequestBody Flux<ExtractTask> tasks) {
+		return 	tasks.map(task -> extractTaskRepository.save(task))
 				.log()
 				.then();
 	}
