@@ -1,15 +1,18 @@
 import org.assertj.core.util.Lists;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AsyncDemo {
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception {
+//        testCallback();
         testFuture();
 //        testReactive();
     }
@@ -57,14 +60,18 @@ public class AsyncDemo {
                     l.stream().map(id -> {
                         CompletableFuture<String> nameTask = nameTask(id);
                         CompletableFuture<String> statTask = statTask(id);
-                        return nameTask.thenCombineAsync(statTask, (name, stat) -> name + " has " + stat);
+                        return nameTask.thenCombineAsync(statTask,
+                                (name, stat) -> name + " has " + stat);
                     });
             List<CompletableFuture<String>> combinationList = zip.collect(Collectors.toList());
-            CompletableFuture<String>[] combinationArray = combinationList.toArray(new CompletableFuture[combinationList.size()]);
+            CompletableFuture<String>[] combinationArray
+                    = combinationList.toArray(new CompletableFuture[combinationList.size()]);
 
             CompletableFuture<Void> allDone = CompletableFuture.allOf(combinationArray);
             return allDone.thenApply(
-                    v -> combinationList.stream().map(CompletableFuture::join).collect(Collectors.toList())
+                    v -> combinationList.stream()
+                            .map(CompletableFuture::join)
+                            .collect(Collectors.toList())
             );
         });
 
@@ -79,17 +86,27 @@ public class AsyncDemo {
                     Mono<String> nameTask = Mono.fromFuture(nameTask(id));
                     Mono<String> statTask = Mono.fromFuture(statTask(id));
                     return nameTask.zipWith(statTask, (name, stat) -> name + " has " + stat);
-                });
-        Mono<List<String>> result = combinations.collectList();
-        List<String> results = result.block();
-        System.out.println(results);
+                }).log().subscribeOn(Schedulers.newElastic("test"));
+//        Mono<List<String>> result = combinations.collectList();
+//        List<String> results = result.block();
+//        System.out.println(results);
 
-//        combinations.subscribe(System.out::println);
-//        try {
-//            Thread.sleep(5000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        combinations.subscribe(System.out::println);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void testCallback() throws InterruptedException {
+        ids().whenComplete(new BiConsumer<List<String>, Throwable>() {
+            @Override
+            public void accept(List<String> strings, Throwable throwable) {
+                System.out.println(strings);
+            }
+        });
+        Thread.sleep(1000);
     }
 
 }
