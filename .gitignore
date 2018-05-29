@@ -9,6 +9,8 @@
 */**/.gitignore
 */**/build
 */.idea
+*/*.class
+*/**/*.class
 
 .classpath
 .gradle/
