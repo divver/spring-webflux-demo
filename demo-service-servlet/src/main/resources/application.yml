@@ -1,16 +1,20 @@
-logging.level.org.springframework.web: INFO
-
 spring:
-#  datasource:
-#    driver-class-name: com.mysql.jdbc.Driver
-#    url: jdbc:mysql://123.206.213.215:3306/petstore_dev?characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
-#    username: test
-#    password: 1234
-#    tomcat.maxActive: 60
-#    tomcat.initSQL: "select 1 from dual"
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/test
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 1234
+    tomcat:
+      validation-query: "SELECT 1"
+      validation-query-timeout: 3
+      validation-interval: 300000
+      test-while-idle: true
+      test-on-borrow: true
+      time-between-eviction-runs-millis: 300000
 
-spring:
-  data:
-    mongodb:
-      host: 127.0.0.1
-      port: 27017
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+
+logging.level.org.hibernate: DEBUG
